@@ -5,12 +5,21 @@ from math import ceil
 
 # Create your views here.
 def index(request):
-    products = Product.objects.all()
-    print(products)
-    n = len(products)
-    nSlides = n//4 + ceil((n/4)-(n//4))
-    params = { 'no_of_slides': nSlides,'product': products, 'range': range(1, nslides)} 
-    return render(request, 'shop/index.html',params )
+    categories = Product.objects.values_list('category', flat=True).distinct()
+    all_products = {}
+
+    for cat in categories:
+        products = list(Product.objects.filter(category=cat))
+        # Group into chunks of 4
+        slides = [products[i:i+4] for i in range(0, len(products), 4)]
+        
+        all_products[cat] = {
+            "slides": slides,
+            "slide_count": len(slides)
+        }
+
+    return render(request, 'shop/index.html', {'all_products': all_products})
+
 
 def about(request):
     return render(request, 'shop/about.html')

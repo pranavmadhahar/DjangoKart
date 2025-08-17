@@ -1,0 +1,56 @@
+{% for category, products in all_products.items %}
+<h2 class="my-4">{{ category }}</h2>
+
+<div id="carousel-{{ forloop.counter }}" class="carousel slide my-3" data-bs-ride="carousel">
+
+    <!-- Indicators -->
+    <div class="carousel-indicators">
+        {% for product in products %}
+        <!-- launch a new slide indicator  at 0, 4, 8...-->
+        {% if forloop.counter0|divisibleby:4 %}
+        <button type="button" data-bs-target="#carousel-{{ forloop.parentloop.counter }}"
+            data-bs-slide-to="{{ forloop.counter0|divisibleby:4 }}"
+            class="{% if forloop.counter0 == 0 %}active{% endif %}" aria-label="Slide {{ forloop.counter }}">
+        </button>
+        {% endif %}
+        {% endfor %}
+    </div>
+
+    <!-- Carousel Inner -->
+    <div class="carousel-inner">
+        <!-- launch a new slide at 0, 4, 8...-->
+        {% for product in products %}
+        {% if forloop.counter0|divisibleby:4 %}
+        <div class="carousel-item {% if forloop.counter0 == 0 %}active{% endif %}">
+            <div class="row">
+                {% endif %}
+
+                <div class="col-md-3">
+                    <div class="card" style="width: 18rem;">
+                        <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.product_name }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.product_name }}</h5>
+                            <p class="card-text">{{ product.desc|truncatewords:15 }}</p>
+                            <a href="#" class="btn btn-primary">Buy ₹{{ product.price }}</a>
+                        </div>
+                    </div>
+                </div>
+
+                {% if forloop.counter|divisibleby:4 or forloop.last %}
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+
+    <!-- Controls -->
+    <button class="carousel-control-prev" type="button" data-bs-target="#carousel-{{ forloop.counter }}"
+        data-bs-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carousel-{{ forloop.counter }}"
+        data-bs-slide="next">
+        <span class="carousel-control-next-icon"></span>
+    </button>
+</div>
+{% endfor %}
