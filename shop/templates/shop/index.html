@@ -63,6 +63,22 @@ background-color: blue;
 .carousel-indicators{
 bottom:0;
 }
+
+.card-body {
+  position: relative;
+  z-index: 1;
+}
+.btn.onclick {
+  position: relative;
+  z-index: 2;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+  margin: 50px;
+}
+
+
 {% endblock %}
 
 {% block body %}
@@ -71,8 +87,6 @@ bottom:0;
 
 
 {% for category, data in all_products.items %}
-<h2 class="my-4">{{ category }}</h2>
-
 <div id="carousel-{{ forloop.counter }}" class="carousel slide my-3" data-bs-ride="carousel" data-bs-interval="3000"
     data-bs-wrap="true">
 
@@ -80,33 +94,36 @@ bottom:0;
     <div class="carousel-indicators">
         {% for _ in data.slides %}
         <button type="button" data-bs-target="#carousel-{{ forloop.parentloop.counter }}"
-            data-bs-slide-to="{{ forloop.counter0 }}" class="{% if forloop.first %}active{% endif %}" 
-            {% if forloop.first %} aria-current="true"{% endif %}
-            aria-label="Slide {{ forloop.counter }}">
+            data-bs-slide-to="{{ forloop.counter0 }}" class="{% if forloop.first %}active{% endif %}"
+             {% if forloop.first %} aria-current="true" {% endif %} aria-label="Slide {{ forloop.counter }}" >
+            
         </button>
         {% endfor %}
     </div>
 
     <!-- Carousel Inner -->
-    <div class="carousel-inner">
-        {% for products in data.slides %}
-        <div class="carousel-item {% if forloop.first %}active{% endif %}">
-            <div class="row">
-                {% for product in products %}
-                <div class="col-md-3">
-                    <div class="card" style="width: 18rem;">
-                        <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.product_name }}">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ product.product_name }}</h5>
-                            <p class="card-text">{{ product.desc|truncatewords:15 }}</p>
-                            <a href="#" class="btn btn-primary">Buy ₹{{ product.price }}</a>
+     <div class="container inner">
+        <h2 class="my-4">{{ category }}</h2>
+        <div class="carousel-inner">
+            {% for products in data.slides %}
+            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                <div class="row">
+                    {% for product in products %}
+                    <div class="col-md-3">
+                        <div class="card" style="width: 18rem;">
+                            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.product_name }}">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ product.product_name }}</h5>
+                                <p class="card-text">{{ product.desc|truncatewords:15 }}</p>
+                                <button id="pr{{ product.product_id}}"  class="btn btn-primary cart" onclick="buttonClick(event)" >Buy ₹{{ product.price }}</button>
+                            </div>
                         </div>
                     </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
 
     <!-- Controls -->
@@ -121,5 +138,46 @@ bottom:0;
 
 </div>
 {% endfor %}
+
+{% endblock %}
+
+{% block js %}
+
+<script>
+    console.log('Working');
+
+    let cart = {};
+
+    if (localStorage.getItem('cart') == null) {
+        cart = {}
+    }
+    else {
+        cart = JSON.parse(localStorage.getItem('cart'))
+    };
+
+    function buttonClick(event) {
+        
+    console.log('Clicked');
+    const cartId = event.currentTarget.id;
+    console.log(cartId);
+
+    if (cart[cartId] !== undefined){
+
+        cart[cartId] = cart[cartId] + 1;
+    }
+    else
+    {
+        cart[cartId] = 1;
+    }
+
+    console.log(cart)
+    localStorage.setItem('cart', JSON.stringify(cart))
+
+    document.getElementById('cart').innerHTML = Object.keys(cart).length
+    };
+
+    console.log('working2');
+    </script>
+
 
 {% endblock %}
