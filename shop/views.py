@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from .models import Product
 from math import ceil
@@ -25,16 +26,19 @@ def about(request):
     return render(request, 'shop/about.html')
 
 def contact(request):
-    return HttpResponse('This is contact page')
+    return render(request, 'shop/contact.html')
 
 def tracker(request):
-    return HttpResponse('This is tracker page')
+    return render(request, 'shop/tracker.html')
 
 def search(request):
-    return HttpResponse('This is search page')
+    return render(request, 'shop/search.html')
 
-def productview(request):
-    return HttpResponse('This is productview page')
+def productview(request, product_id):
+    # fetch product using the product_id
+    product = get_object_or_404(Product, product_id=product_id)
+    print(product)
+    return render(request, 'shop/productview.html', {'product': product})
 
 def checkout(request):
-    return HttpResponse('This is checkout page')
+    return render(request, 'shop/checkout.html')

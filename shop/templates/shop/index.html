@@ -17,6 +17,13 @@ border-radius: 50%;
 /* optional: round buttons */
 }
 
+.carousel-control-prev{
+    left: -25px;
+}
+.carousel-control-next{
+    right: -25px;
+}
+
 /* ---- Layout & spacing ---- */
 .carousel-inner .row {
 margin: 0;
@@ -116,6 +123,7 @@ bottom:0;
                                 <h5 class="card-title">{{ product.product_name }}</h5>
                                 <p class="card-text">{{ product.desc|truncatewords:15 }}</p>
                                 <button id="pr{{ product.product_id}}"  class="btn btn-primary cart" onclick="buttonClick(event)" >Buy ₹{{ product.price }}</button>
+                                <a href="/shop/products/{{product.product_id}}"><button id="vr{{ product.product_id}}"  class="btn btn-primary cart" >Quick View</button></a>
                             </div>
                         </div>
                     </div>
@@ -144,7 +152,7 @@ bottom:0;
 {% block js %}
 
 <script>
-    console.log('Working');
+    console.log('Working1');
 
     let cart = {};
 
@@ -156,7 +164,7 @@ bottom:0;
     };
 
     function buttonClick(event) {
-        
+
     console.log('Clicked');
     const cartId = event.currentTarget.id;
     console.log(cartId);
@@ -174,9 +182,26 @@ bottom:0;
     localStorage.setItem('cart', JSON.stringify(cart))
 
     document.getElementById('cart').innerHTML = Object.keys(cart).length
+
+    
+
     };
 
     console.log('working2');
+
+
+
+    const popkart1 = document.getElementById('popkart')
+    const options = {
+        trigger: 'click',
+        placement: 'bottom'
+    };
+    const popover = new bootstrap.Popover(popkart1, options);
+
+    document.getElementById('popkart').setAttribute('data-bs-content', `You have ${Object.keys(cart).length} items in your cart.`);
+    
+
+
     </script>
 
 

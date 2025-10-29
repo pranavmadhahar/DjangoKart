@@ -1,4 +1,63 @@
 {% extends 'shop/basic.html' %}
-{% block title %} This is about title {% endblock %}
+{% block title %} About Us{% endblock %}
 
-{% block body %} This is body {% endblock %}
+{% block body %}
+
+<main>
+
+    <div class="jumbotron bg-dark text-center text-light">
+        <div class="container py-2">
+            <h1 class="display-4">Welcome to Bootstrap!</h1>
+            <p class="lead">This is a simple hero unit, a simple jumbotron-style component for calling extra attention
+                to
+                featured content or information.
+            </p>
+            <hr class="my-4">
+            <p>It uses utility classes for typography and spacing to space content out within the larger container.</p>
+            <a class="btn btn-primary btn-lg my-2" href="#" role="button">Learn more</a>
+        </div>
+    </div>
+    <!-- Wrap the rest of the page in another container to center all the content. -->
+    <div class="container my-4">
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="card-title">Heading One</h2>
+                        <p class="card-text">Some representative placeholder content for the first column.</p>
+                        <a class="btn btn-secondary" href="#">View details &raquo;</a>
+                    </div>
+                </div>
+            </div><!-- /.col-lg-4 -->
+
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="card-title">Heading Two</h2>
+                        <p class="card-text">Another exciting bit of representative placeholder content in the second
+                            column.</p>
+                        <a class="btn btn-secondary" href="#">View details &raquo;</a>
+                    </div>
+                </div>
+            </div><!-- /.col-lg-4 -->
+
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="card-title">Heading Three</h2>
+                        <p class="card-text">Some representative placeholder content for the third column.</p>
+                        <a class="btn btn-secondary" href="#">View details &raquo;</a>
+                    </div>
+                </div>
+            </div><!-- /.col-lg-4 -->
+        </div><!-- /.row -->
+    </div><!-- /.container -->
+
+    <footer class="container">
+        <p class="float-end"><a href="#">Back to top</a></p>
+        <p class="float-start">&copy; 2017–2025 Company, Inc. &middot; <a href="#">Privacy</a> &middot; <a href="#">Terms</a></p>
+    </footer>
+
+</main>
+
+{% endblock %}
