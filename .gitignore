@@ -6,4 +6,7 @@ __pycache__/
 db.sqlite3
 /staticfiles/
 /media/
+**/test.js
+**/index2.html
+
 

@@ -120,9 +120,9 @@ bottom:0;
                         <div class="card" style="width: 18rem;">
                             <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.product_name }}">
                             <div class="card-body">
-                                <h5 class="card-title">{{ product.product_name }}</h5>
+                                <h5 class="card-title" id="prname{{ product.product_id}}"  >{{ product.product_name }}</h5>
                                 <p class="card-text">{{ product.desc|truncatewords:15 }}</p>
-                                <button id="pr{{ product.product_id}}"  class="btn btn-primary cart" onclick="buttonClick(event)" >Buy ₹{{ product.price }}</button>
+                                <button id="pr{{ product.product_id}}"  class="btn btn-primary cart" onclick="buttonClick(event)" >Buy ₹{{ product.price }} <span id="it{{ product.product_id}}" ></span>  </button>
                                 <a href="/shop/products/{{product.product_id}}"><button id="vr{{ product.product_id}}"  class="btn btn-primary cart" >Quick View</button></a>
                             </div>
                         </div>
@@ -152,7 +152,10 @@ bottom:0;
 {% block js %}
 
 <script>
+
     console.log('Working1');
+
+    //Initial cart state on load//
 
     let cart = {};
 
@@ -163,46 +166,163 @@ bottom:0;
         cart = JSON.parse(localStorage.getItem('cart'))
     };
 
+    
+    let popoverInitialized = false;
+
+    //initial popover message//
+    updatePopover() 
+
+    function updatePopover(cart, popOverMessage="Your cart is empty"){
+
+        const popkart1 = document.getElementById('popkart')
+
+        //This will ensure popover is not initialized everytime but only gets updated//
+        if (!popoverInitialized){
+
+            const options = {
+                trigger: 'click',
+                placement: 'bottom',
+                html: true
+            };
+            const popover = new bootstrap.Popover(popkart1, options);
+
+            popoverInitialized = true;
+
+        }
+        
+        const bsPopover = bootstrap.Popover.getInstance(popkart1);
+
+        if (bsPopover){
+
+            bsPopover.setContent({ '.popover-body': popOverMessage}); 
+
+        }else {
+            
+            popkart1.setAttribute('data-bs-content', popOverMessage); 
+        }
+
+    };
+
+
     function buttonClick(event) {
 
-    console.log('Clicked');
-    const cartId = event.currentTarget.id;
-    console.log(cartId);
+        const productId = event.currentTarget.id
+        //Name of the product //
+        const prodNameId = productId.replace('pr', 'prname')
+        let prodName = document.getElementById(prodNameId).innerHTML
 
-    if (cart[cartId] !== undefined){
 
-        cart[cartId] = cart[cartId] + 1;
-    }
-    else
-    {
-        cart[cartId] = 1;
-    }
+        if(!localStorage.getItem('cart')){
+            cart = {};
+        }else{
+            cart = JSON.parse(localStorage.getItem('cart'));
+        }
 
-    console.log(cart)
-    localStorage.setItem('cart', JSON.stringify(cart))
+        //Cart Logic//
+        if (cart[productId]){
 
-    document.getElementById('cart').innerHTML = Object.keys(cart).length
-
+            cart[productId].quantity = cart[productId].quantity + 1;
+        }
+        else
+        {        
+            cart[productId] = {
+                name: prodName,
+                quantity: 1
+            }
+        }
     
+        localStorage.setItem('cart', JSON.stringify(cart))
+
+        //No. of product items //
+        const prodItemId = productId.replace('pr', 'it')
+
+        let prodItemElement = document.getElementById(prodItemId)
+
+        let prodItems = cart[productId].quantity
+
+        if (prodItemElement){
+
+            prodItemElement.innerHTML = ` (${prodItems || 0})`
+        }
+        
+        //Total items//
+        let totalItems = 0;
+
+        for (let productId in cart){
+
+            totalItems = totalItems + cart[productId].quantity;
+        }
+
+        document.getElementById('cart').innerHTML = totalItems
+
+        let popOverMessage = `<h5>Your Cart</h5>\n<br><b>Product   :   Quantity</b><hr><ul>`;
+
+        if(Object.keys(cart).length !==0){
+            
+            let index = 1;
+
+            for(let productId in cart){
+
+                let productName = cart[productId].name;
+                let productQuantity = cart[productId].quantity;
+
+                popOverMessage = `${popOverMessage}<li>${productName.slice(0, 15)} <b>: ${productQuantity}</b></li><hr>`;
+                index++;
+            }
+
+            let popOverEndMsg = `</ul>\n<hr><b>Total : ${Object.keys(cart).length} products & ${totalItems} items</b>`
+
+            let popOverBtns = "<a href='/shop/' id='clearCart'class='button btn btn-primary mx-1 my-4' >Clear Cart</a><a class='btn btn-primary mx-1 my-4' href='/shop/checkout'>Checkout</a>"
+
+            popOverMessage = popOverMessage  + popOverEndMsg + popOverBtns;
+
+        }else{
+
+            popOverMessage = "Your cart is empty"
+        }
+
+        updatePopover(cart, popOverMessage);
 
     };
 
+
+    function clearCart(){
+  
+        localStorage.removeItem('cart');
+
+        document.getElementById('cart').innerHTML = 0;
+
+        //select all product quantity elements and reset its value to default//
+        const productItems = document.querySelectorAll('[id^="it"]');
+
+        productItems.forEach((item)=>{
+
+            item.innerHTML = ""
+        })
+        
+        console.log('success')
+     
+        updatePopover();
+
+    }
+
+    document.addEventListener('click', function (e) {
+
+        if (e.target && e.target.id === 'clearCart') {
+
+            e.preventDefault();
+            clearCart();
+        }
+    });
+    
     console.log('working2');
 
-
-
-    const popkart1 = document.getElementById('popkart')
-    const options = {
-        trigger: 'click',
-        placement: 'bottom'
-    };
-    const popover = new bootstrap.Popover(popkart1, options);
-
-    document.getElementById('popkart').setAttribute('data-bs-content', `You have ${Object.keys(cart).length} items in your cart.`);
-    
-
-
-    </script>
+</script>
 
 
 {% endblock %}
+
+
+
+
+
