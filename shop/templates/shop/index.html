@@ -156,7 +156,7 @@ bottom:0;
     console.log('Working1');
 
     //Initial cart state on load//
-
+    
     let cart = {};
 
     if (localStorage.getItem('cart') == null) {
@@ -169,8 +169,57 @@ bottom:0;
     
     let popoverInitialized = false;
 
-    //initial popover message//
-    updatePopover() 
+    //update the cart along with popover//
+    updateCart() 
+
+
+    function updateCart(){
+
+        let totalItems = 0;
+
+        for (let product_id in cart){
+
+            let prodItems = cart[product_id].quantity;
+
+            let prodItemId = product_id.replace('pr', 'it');
+            //update product wise items//
+            let prodItemElement = document.getElementById(prodItemId);
+
+            prodItemElement.innerHTML = ` (${prodItems || 0})`;
+
+            totalItems = totalItems + cart[product_id].quantity;
+        }
+        //update total items//
+        document.getElementById('cart').innerHTML = totalItems
+
+        //popover message//
+        let popOverMessage = `<h5>Your Cart</h5>\n<br><b>Product   :   Quantity</b><hr><ul>`;
+
+        if(Object.keys(cart).length !==0){
+
+            for(let product_id in cart){
+
+                let productName = cart[product_id].name;
+                let productQuantity = cart[product_id].quantity;
+
+                popOverMessage = `${popOverMessage}<li>${productName.slice(0, 15)} <b>: ${productQuantity}</b></li><hr>`;
+               
+            }
+
+            let popOverEndMsg = `</ul>\n<hr><b>Total : ${Object.keys(cart).length} products & ${totalItems} items</b>`
+
+            let popOverBtns = "<a href='/shop/' id='clearCart'class='button btn btn-primary mx-1 my-4' >Clear Cart</a><a class='btn btn-primary mx-1 my-4' href='/shop/checkout'>Checkout</a>"
+
+            popOverMessage = popOverMessage  + popOverEndMsg + popOverBtns;
+
+        }else{
+
+            popOverMessage = "Your cart is empty"
+        }
+
+        updatePopover(cart, popOverMessage);
+
+    }
 
     function updatePopover(cart, popOverMessage="Your cart is empty"){
 
@@ -211,7 +260,7 @@ bottom:0;
         const prodNameId = productId.replace('pr', 'prname')
         let prodName = document.getElementById(prodNameId).innerHTML
 
-
+        //check cart status//
         if(!localStorage.getItem('cart')){
             cart = {};
         }else{
@@ -233,55 +282,10 @@ bottom:0;
     
         localStorage.setItem('cart', JSON.stringify(cart))
 
-        //No. of product items //
-        const prodItemId = productId.replace('pr', 'it')
+        console.log(cart)
 
-        let prodItemElement = document.getElementById(prodItemId)
+        updateCart();
 
-        let prodItems = cart[productId].quantity
-
-        if (prodItemElement){
-
-            prodItemElement.innerHTML = ` (${prodItems || 0})`
-        }
-        
-        //Total items//
-        let totalItems = 0;
-
-        for (let productId in cart){
-
-            totalItems = totalItems + cart[productId].quantity;
-        }
-
-        document.getElementById('cart').innerHTML = totalItems
-
-        let popOverMessage = `<h5>Your Cart</h5>\n<br><b>Product   :   Quantity</b><hr><ul>`;
-
-        if(Object.keys(cart).length !==0){
-            
-            let index = 1;
-
-            for(let productId in cart){
-
-                let productName = cart[productId].name;
-                let productQuantity = cart[productId].quantity;
-
-                popOverMessage = `${popOverMessage}<li>${productName.slice(0, 15)} <b>: ${productQuantity}</b></li><hr>`;
-                index++;
-            }
-
-            let popOverEndMsg = `</ul>\n<hr><b>Total : ${Object.keys(cart).length} products & ${totalItems} items</b>`
-
-            let popOverBtns = "<a href='/shop/' id='clearCart'class='button btn btn-primary mx-1 my-4' >Clear Cart</a><a class='btn btn-primary mx-1 my-4' href='/shop/checkout'>Checkout</a>"
-
-            popOverMessage = popOverMessage  + popOverEndMsg + popOverBtns;
-
-        }else{
-
-            popOverMessage = "Your cart is empty"
-        }
-
-        updatePopover(cart, popOverMessage);
 
     };
 
@@ -314,6 +318,8 @@ bottom:0;
             clearCart();
         }
     });
+
+    updateCart()
     
     console.log('working2');
 
