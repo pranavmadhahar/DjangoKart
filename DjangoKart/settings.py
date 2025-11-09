@@ -58,7 +58,7 @@ ROOT_URLCONF = 'DjangoKart.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['DjangoKart/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

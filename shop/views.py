@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
-from .models import Product, Contact
+from .models import Product, Contact, Order, OrderUpdate
 from math import ceil
 
 
@@ -40,9 +40,6 @@ def contact(request):
         )
         contact.save()
 
-        
-       
-
     return render(request, 'shop/contact.html')
 
 def tracker(request):
@@ -58,4 +55,43 @@ def productview(request, product_id):
     return render(request, 'shop/productview.html', {'product': product})
 
 def checkout(request):
-    return render(request, 'shop/checkout.html')
+        
+        thank = False
+
+        if request.method == 'POST':
+            items_json = request.POST.get('itemsJson', '')
+            name = request.POST.get('name', '')
+            email = request.POST.get('email', '')
+            phone = request.POST.get('phone', '')
+            address = request.POST.get('address1', '') + request.POST.get('address2', '')
+            city = request.POST.get('city', '')
+            state = request.POST.get('state', '')
+            zip_code = request.POST.get('zip_code', '')
+
+            order = Order(
+                items_json = items_json,
+                name = name,
+                email = email,
+                phone = phone,
+                address = address,
+                city = city,
+                state = state,
+                zip_code = zip_code
+            )
+
+            order.save()
+            orderId = order.order_id
+            update = OrderUpdate(
+                order_id = orderId, 
+                update_desc = "Your order has been placed"
+            )
+            update.save()
+            thank = True
+
+            return render(request, 'shop/checkout.html', {'thank':thank, 'orderId': orderId})
+        
+        return render(request, 'shop/checkout.html')
+            
+
+
+        

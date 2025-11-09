@@ -20,43 +20,46 @@
 
     <h2 class="my-4">Step-2 - Enter Address </h2>
 
-    <form class="row g-3">
+    <form class="row g-3" method="post" id="checkoutForm" action="/shop/checkout/">
+        {% csrf_token %}
+
+        <input type="hidden" id="itemsJson" name="itemsJson" >
 
         <div class="col-md-6">
             <label for="name" class="form-label">Name</label>
-            <input type="text" class="form-control" id="name" placeholder="Name">
+            <input type="text" class="form-control" id="name" name="name" placeholder="Name">
         </div>
 
         <div class="col-md-6">
             <label for="email" class="form-label">Email</label>
-            <input type="email" class="form-control" id="email" placeholder="emailaddress@example.com">
+            <input type="email" class="form-control" id="email" name="email" placeholder="emailaddress@example.com">
         </div>
 
         <div class="col-12">
             <label for="inputPhone" class="form-label">Phone No.</label>
-            <input type="text" class="form-control" id="inputPhone" placeholder="1234...">
+            <input type="text" class="form-control" id="inputPhone" name="phone" placeholder="1234...">
         </div>
 
         <div class="col-12">
             <label for="inputAddress" class="form-label">Address line 1</label>
-            <input type="text" class="form-control" id="inputAddress" placeholder="1234 Main St...">
+            <input type="text" class="form-control" id="inputAddress" name="address1"   placeholder="1234 Main St...">
         </div>
         <div class="col-12">
             <label for="inputAddress2" class="form-label">Address line 2</label>
-            <input type="text" class="form-control" id="inputAddress2" placeholder="Apartment, studio, or floor">
+            <input type="text" class="form-control" id="inputAddress2" name="address2" placeholder="Apartment, studio, or floor">
         </div>
         <div class="col-md-6">
             <label for="inputCity" class="form-label">City</label>
-            <input type="text" class="form-control" id="inputCity" placeholder="Your City">
+            <input type="text" class="form-control" id="inputCity" name="city" placeholder="Your City">
         </div>
         <div class="col-md-4">
             <label for="inputState" class="form-label">State</label>
-            <input type="text" class="form-control" id="inputState" placeholder="Enter your state">
+            <input type="text" class="form-control" id="inputState" name="state" placeholder="Enter your state">
 
         </div>
         <div class="col-md-2">
             <label for="inputPin" class="form-label">Pin</label>
-            <input type="text" class="form-control" id="inputPin">
+            <input type="text" class="form-control" name="zip_code" id="inputPin">
         </div>
 
         <div class="col-12 my-4">
@@ -105,14 +108,43 @@
             myText = myText + `<div class="input-group" ><input type="text" value="${index}.  ${productName}" class="form-control" aria-label="cart-item(number)">
             <span class="input-group-text">${quantity}</span></div>`
             index++
-            
+
         }
 
         document.getElementById('cart').innerHTML = totalItems
         cartItemElement.innerHTML = myText
-        
 
     }
+
+    const form = document.getElementById('checkoutForm')
+
+   
+    //itemsJson is hidden & gets populated after the form submission, this step stops form submission, populates & save data init & manually submits the form//
+    form.addEventListener('submit', function(e){
+
+        e.preventDefault();
+
+        const custCart = JSON.stringify(cart);
+        document.getElementById('itemsJson').value = custCart;
+
+        form.submit();
+        
+    });
+
+    //convert thank, orderId variable from django to js//
+    let thank = "{{ thank|yesno:'true,false' }}";
+    let orderId = "{{ orderId }}";
+   
+    if (thank === 'true'){
+
+        alert(`Your order is placed. Your order id is ${orderId}`)
+        
+        localStorage.clear()
+        document.location = '/shop/'
+
+    }
+    
+    
 
 
 </script>

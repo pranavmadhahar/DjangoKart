@@ -1,4 +1,49 @@
 {% extends 'shop/basic.html' %}
-{% block title %} Tracker {% endblock %}
+{% block title %} DjangoKart-Tracker {% endblock %}
 
-{% block body %} This is tracker page {% endblock %}
+{% block body %}
+
+<div class="container mx-auto">
+
+    <div class="col my-4">
+
+        <h2 class="my-4">Enter your Order Id & Email to track your order </h2>
+        <form class="row g-3" method="post" id="checkoutForm" action="/shop/checkout/">
+            {% csrf_token %}
+
+
+            <div class="col-md-6">
+                <label for="orderId" class="form-label">Order Id</label>
+                <input type="text" class="form-control" id="orderId" name="name" placeholder="Order Id">
+            </div>
+
+            <div class="col-md-6">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="emailaddress@example.com">
+            </div>
+
+            <div class="col-12 my-4">
+                <button type="submit" class="btn btn-primary">Track Order</button>
+            </div>
+        </form>
+
+    </div>
+
+    <div class="col my-4">
+
+        <h2>Your Order Status</h2>
+        <div class="my-4">
+
+            <ul class="list-group" id="items">
+
+            </ul>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+{% endblock %}
