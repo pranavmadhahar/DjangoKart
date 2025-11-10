@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from .models import Product, Contact, Order, OrderUpdate
 from math import ceil
+import json 
 
 
 # Create your views here.
@@ -91,6 +92,37 @@ def checkout(request):
             return render(request, 'shop/checkout.html', {'thank':thank, 'orderId': orderId})
         
         return render(request, 'shop/checkout.html')
+
+
+def tracker(request):
+
+        if request.method == 'POST':
+            orderId = request.POST.get('orderId', '')
+            email = request.POST.get('email', '')
+
+            # first; check if the order exits
+            try:
+                 order = Order.objects.filter(order_id=orderId, email=email) 
+            # second; extract the order updates
+                 if order:
+                      updates = OrderUpdate.objects.filter(order_id=orderId)
+                    # using list comprehension method for creating list containing updates 
+                      response_data = [{'text': update.update_desc, 'time': update.timestamp} for update in updates]
+                    # Serialize date, time with default=str 
+                      response = json.dumps(response_data, default=str)
+                      return HttpResponse(response)
+                 else:
+                      return HttpResponse('Order does not exist', status=404)
+            
+            except Exception as e: 
+                 print(f" An error occured: {e}")
+                 return HttpResponse('Pls enter correct details', status=404)
+        
+        else: 
+             return render(request, 'shop/tracker.html')
+
+                        
+                
             
 
 

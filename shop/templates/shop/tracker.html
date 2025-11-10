@@ -8,13 +8,13 @@
     <div class="col my-4">
 
         <h2 class="my-4">Enter your Order Id & Email to track your order </h2>
-        <form class="row g-3" method="post" id="checkoutForm" action="/shop/checkout/">
+        <form class="row g-3" method="post" id="trackerForm" action="/shop/tracker/">
             {% csrf_token %}
 
 
             <div class="col-md-6">
                 <label for="orderId" class="form-label">Order Id</label>
-                <input type="text" class="form-control" id="orderId" name="name" placeholder="Order Id">
+                <input type="text" class="form-control" id="orderId" name="orderId" placeholder="Order Id" required>
             </div>
 
             <div class="col-md-6">
@@ -44,6 +44,89 @@
     </div>
 
 </div>
+
+
+{% endblock %}
+
+{% block js %}
+
+<script>
+
+    document.addEventListener('submit', async function (event) {
+
+        event.preventDefault();
+
+        const orderId = document.getElementById('orderId').value;
+        const email = document.getElementById('email').value;
+        const url = '{% url "tracker" %}'
+        const data = new URLSearchParams();
+        data.append('orderId', orderId);
+        data.append('email', email);
+        // using document.querySelector('element[attributeName="value"]');
+        const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+
+        const params = {
+
+            method: 'POST',
+            body: data,
+            headers: {
+
+                'X-CSRFToken': csrfToken,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+
+        };
+
+        let response_data;
+
+        try {
+
+            const response = await fetch(url, params);
+
+            if (!response.ok) {
+
+                throw new Error('Network response not ok');
+            }
+
+            response_data = await response.json();
+
+            console.log(response_data);
+
+        } catch (error) {
+
+            console.log(`Some error occurred: ${error.message}`)
+
+        }
+
+        console.log(response_data)
+
+        let items = document.getElementById('items');
+
+        let myStr = ""
+        let index = 1;
+
+        for (let item of response_data) {
+
+            let updateMessage = item.text
+            let updateTime = item.time
+
+            myStr = myStr + `<li>
+              <div class="input-group" ><input type="text" value="${updateMessage}" class="form-control" aria-label="cart-item(number)">
+            <span class="input-group-text">${updateTime}</span></div>
+                </li>`
+
+        }
+
+        items.innerHTML = myStr
+
+    });
+
+
+
+</script>
+
+
+
 
 
 {% endblock %}
