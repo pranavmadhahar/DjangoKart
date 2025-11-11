@@ -27,6 +27,10 @@ def about(request):
     return render(request, 'shop/about.html')
 
 def contact(request):
+
+    thank = False
+    name = ''
+
     if request.method == 'POST':
         name = request.POST.get('name', '')
         email = request.POST.get('email', '')
@@ -40,8 +44,9 @@ def contact(request):
             msg = message
         )
         contact.save()
+        thank = True
 
-    return render(request, 'shop/contact.html')
+    return render(request, 'shop/contact.html', {'thank':  thank, 'name': name})
 
 def tracker(request):
     return render(request, 'shop/tracker.html')
@@ -54,6 +59,7 @@ def productview(request, product_id):
     product = get_object_or_404(Product, product_id=product_id)
     print(product)
     return render(request, 'shop/productview.html', {'product': product})
+
 
 def checkout(request):
         
@@ -107,9 +113,9 @@ def tracker(request):
                  if order:
                       updates = OrderUpdate.objects.filter(order_id=orderId)
                     # using list comprehension method for creating list containing updates 
-                      response_data = [{'text': update.update_desc, 'time': update.timestamp} for update in updates]
+                      update_data = [{'text': update.update_desc, 'time': update.timestamp} for update in updates]
                     # Serialize date, time with default=str 
-                      response = json.dumps(response_data, default=str)
+                      response = json.dumps([update_data, order[0].items_json], default=str)
                       return HttpResponse(response)
                  else:
                       return HttpResponse('Order does not exist', status=404)

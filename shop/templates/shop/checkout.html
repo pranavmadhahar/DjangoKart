@@ -7,13 +7,8 @@
 
     <h2 class="my-4">Step-1 - Express Checkout - Review Your Cart Items</h2>
 
-    <div class="my-4" id="cartItems" >
+    <div class="my-4" id="cartItems">
 
-        <div class="input-group" >
-            <input type="text" value="" class="form-control" aria-label="cart-item(number)">
-            <span class="input-group-text"></span>
-
-        </div>
 
 
     </div>
@@ -23,7 +18,7 @@
     <form class="row g-3" method="post" id="checkoutForm" action="/shop/checkout/">
         {% csrf_token %}
 
-        <input type="hidden" id="itemsJson" name="itemsJson" >
+        <input type="hidden" id="itemsJson" name="itemsJson">
 
         <div class="col-md-6">
             <label for="name" class="form-label">Name</label>
@@ -42,11 +37,12 @@
 
         <div class="col-12">
             <label for="inputAddress" class="form-label">Address line 1</label>
-            <input type="text" class="form-control" id="inputAddress" name="address1"   placeholder="1234 Main St...">
+            <input type="text" class="form-control" id="inputAddress" name="address1" placeholder="1234 Main St...">
         </div>
         <div class="col-12">
             <label for="inputAddress2" class="form-label">Address line 2</label>
-            <input type="text" class="form-control" id="inputAddress2" name="address2" placeholder="Apartment, studio, or floor">
+            <input type="text" class="form-control" id="inputAddress2" name="address2"
+                placeholder="Apartment, studio, or floor">
         </div>
         <div class="col-md-6">
             <label for="inputCity" class="form-label">City</label>
@@ -85,17 +81,18 @@
 
     cartItemElement.innerHTML = ""
 
-    if(Object.keys(cart).length == 0){
+    if (Object.keys(cart).length == 0) {
 
         cartItemElement.innerHTML = `Your cart is empty`
 
-    }else{
+    } else {
 
         let myText = "";
 
         let index = 1;
 
         let totalItems = 0;
+        let totalPrice = 0;
 
         for (let item in cart) {
 
@@ -103,13 +100,19 @@
 
             let quantity = cart[item].quantity
 
+            let price = cart[item].price
+
             totalItems = totalItems + quantity
-            
+            totalPrice = totalPrice + price
+
             myText = myText + `<div class="input-group" ><input type="text" value="${index}.  ${productName}" class="form-control" aria-label="cart-item(number)">
-            <span class="input-group-text">${quantity}</span></div>`
+            <span class="input-group-text" style="width: 40px;" >${quantity}</span><span class="input-group-text" style="width: 100px;" >₹${price}</span></div>`
             index++
 
         }
+
+        myText = myText + `<div class="input-group" ><input style="font-weight: bold;"  type="text" value="Grand Total" class="form-control font-weight-bold" aria-label="cart-item(number)">
+            <span class="input-group-text" style="width: 40px;"><b>${totalItems}</b></span><span class="input-group-text"style="width: 100px;"><b>₹${totalPrice}</b></span></div>`
 
         document.getElementById('cart').innerHTML = totalItems
         cartItemElement.innerHTML = myText
@@ -118,9 +121,9 @@
 
     const form = document.getElementById('checkoutForm')
 
-   
+
     //itemsJson is hidden & gets populated after the form submission, this step stops form submission, populates & save data init & manually submits the form//
-    form.addEventListener('submit', function(e){
+    form.addEventListener('submit', function (e) {
 
         e.preventDefault();
 
@@ -128,23 +131,23 @@
         document.getElementById('itemsJson').value = custCart;
 
         form.submit();
-        
+
     });
 
     //convert thank, orderId variable from django to js//
     let thank = "{{ thank|yesno:'true,false' }}";
     let orderId = "{{ orderId }}";
-   
-    if (thank === 'true'){
+
+    if (thank === 'true') {
 
         alert(`Your order is placed. Your order id is ${orderId}`)
-        
+
         localStorage.clear()
         document.location = '/shop/'
 
     }
-    
-    
+
+
 
 
 </script>

@@ -43,6 +43,20 @@
 
     </div>
 
+    <div class="col my-4">
+
+        <h2>Your Order Details</h2>
+        <div class="my-4" >
+            <ol class="list-group" id="cartitems">
+
+            </ol>
+
+
+        </div>
+
+
+    </div>
+
 </div>
 
 
@@ -55,16 +69,16 @@
     document.addEventListener('submit', async function (event) {
 
         event.preventDefault();
-
+        //collect variables//
         const orderId = document.getElementById('orderId').value;
         const email = document.getElementById('email').value;
         const url = '{% url "tracker" %}'
         const data = new URLSearchParams();
         data.append('orderId', orderId);
         data.append('email', email);
-        // using document.querySelector('element[attributeName="value"]');
+        //using document.querySelector('element[attributeName="value"]');
         const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
-
+        //define parameters//
         const params = {
 
             method: 'POST',
@@ -77,47 +91,81 @@
 
         };
 
-        let response_data;
 
         try {
-
+            //API call//
             const response = await fetch(url, params);
+            const response_data = await response.json();
 
             if (!response.ok) {
 
                 throw new Error('Network response not ok');
             }
 
-            response_data = await response.json();
+            //update message for display//
+            const items = document.getElementById('items');
 
-            console.log(response_data);
+            let myStr = ""
+
+            for (let item of response_data[0]) {
+
+                let updateMessage = item.text
+                let updateTime = item.time
+
+                myStr = myStr + `<li>
+              <div class="input-group" ><input type="text" value="${updateMessage}" class="form-control" aria-label="cart-item(number)">
+            <span class="input-group-text">${updateTime}</span></div>
+                </li>`
+
+            }
+
+            items.innerHTML = myStr
+
+
+            //update cart items for display//
+            let cart = JSON.parse(response_data[1])
+
+            if (Object.keys(cart).length == 0) {
+
+                cartItemElement.innerHTML = `Your cart is empty`
+
+            } else {
+
+                let myText = "";
+
+
+                let totalItems = 0;
+                let totalPrice = 0;
+
+                for (let item in cart) {
+
+                    let productName = cart[item].name
+
+                    let quantity = cart[item].quantity
+
+                    let price = cart[item].price
+
+                    totalItems = totalItems + quantity
+                    totalPrice = totalPrice + price
+
+                    myText = myText + `<li><div class="input-group" ><input type="text" value="${productName}" class="form-control" aria-label="cart-item(number)">
+            <span class="input-group-text" style="width: 40px;" >${quantity}</span><span class="input-group-text" style="width: 100px;" >₹${price}</span></div></li>`
+                   
+
+                }
+
+                myText = myText + `<div class="input-group" ><input style="font-weight: bold;"  type="text" value="Grand Total" class="form-control font-weight-bold" aria-label="cart-item(number)">
+            <span class="input-group-text" style="width: 40px;"><b>${totalItems}</b></span><span class="input-group-text"style="width: 100px;"><b>₹${totalPrice}</b></span></div>`
+
+                document.getElementById('cartitems').innerHTML = myText
+
+            }
 
         } catch (error) {
 
             console.log(`Some error occurred: ${error.message}`)
 
         }
-
-        console.log(response_data)
-
-        let items = document.getElementById('items');
-
-        let myStr = ""
-        let index = 1;
-
-        for (let item of response_data) {
-
-            let updateMessage = item.text
-            let updateTime = item.time
-
-            myStr = myStr + `<li>
-              <div class="input-group" ><input type="text" value="${updateMessage}" class="form-control" aria-label="cart-item(number)">
-            <span class="input-group-text">${updateTime}</span></div>
-                </li>`
-
-        }
-
-        items.innerHTML = myStr
 
     });
 

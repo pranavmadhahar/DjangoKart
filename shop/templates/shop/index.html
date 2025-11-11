@@ -122,7 +122,7 @@ bottom:0;
                             <div class="card-body">
                                 <h5 class="card-title" id="prname{{ product.product_id}}"  >{{ product.product_name }}</h5>
                                 <p class="card-text">{{ product.desc|truncatewords:15 }}</p>
-                                <button id="pr{{ product.product_id}}"  class="btn btn-primary cart" onclick="buttonClick(event)" >Buy ₹{{ product.price }} <span id="it{{ product.product_id}}" ></span>  </button>
+                                <button id="pr{{ product.product_id}}"  class="btn btn-primary cart" onclick="buttonClick(event)">Buy ₹<span id ="prprice{{ product.product_id}}" >{{ product.price }} </span><span id="it{{ product.product_id}}" ></span>  </button>
                                 <a href="/shop/products/{{product.product_id}}"><button id="vr{{ product.product_id}}"  class="btn btn-primary cart" >Quick View</button></a>
                             </div>
                         </div>
@@ -259,6 +259,9 @@ bottom:0;
         //Name of the product //
         const prodNameId = productId.replace('pr', 'prname')
         let prodName = document.getElementById(prodNameId).innerHTML
+        //Price of the product//
+        const prodPriceId = productId.replace('pr', 'prprice')
+        let prodPrice = Number(document.getElementById(prodPriceId).innerHTML)
 
         //check cart status//
         if(!localStorage.getItem('cart')){
@@ -276,7 +279,8 @@ bottom:0;
         {        
             cart[productId] = {
                 name: prodName,
-                quantity: 1
+                quantity: 1,
+                price: prodPrice
             }
         }
     

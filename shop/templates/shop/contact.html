@@ -61,3 +61,20 @@
 
 
 {% endblock %}
+
+{% block js %}
+
+<script>
+
+let thank = "{{ thank|yesno:'true,false' }}"
+let name = "{{ name }}"
+
+if(thank === 'true'){
+
+    alert(`Thanks ${name} for contacting us`);
+    document.location = '/shop/contact/'
+}
+
+</script>
+
+{% endblock %}
