@@ -1,4 +1,350 @@
 {% extends 'shop/basic.html' %}
-{% block title %} Search {% endblock %}
 
-{% block body %} This is search page {% endblock %}
+{% block title %}  DjangoKart-Search  {% endblock %}
+
+{% block css %}
+
+/* ---- Carousel color accents ---- */
+.carousel-indicators button {
+background-color: blue;
+/* indicator dots */
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+background-color: blue;
+/* arrow icons */
+background-size: 100% 100%;
+border-radius: 50%;
+/* optional: round buttons */
+}
+
+.carousel-control-prev{
+    left: -25px;
+}
+.carousel-control-next{
+    right: -25px;
+}
+
+/* ---- Layout & spacing ---- */
+.carousel-inner .row {
+margin: 0;
+/* remove default row margin */
+}
+
+.col-md-3 {
+padding: 0 0.5rem;
+/* gutter between cards */
+}
+
+/* ---- Card & image sizing ---- */
+.card {
+height: 100%;
+/* equal card heights */
+}
+
+.card-img-top {
+width: 100%;
+height: 200px;
+/* fixed visual height for uniform slides */
+object-fit: cover;
+/* crop instead of stretch */
+background-color: #e9ecef;
+/* placeholder background */
+}
+
+/* Optional: ensure all slide rows stretch to same height */
+.carousel-item .row {
+display: flex;
+align-items: stretch;
+}
+
+/* ---- Optional body no‑padding variant ---- */
+body.no-padding {
+padding-left: 0;
+padding-right: 0;
+}
+
+.carousel-indicators .active{
+background-color: blue;
+}
+
+.carousel-indicators{
+bottom:0;
+}
+
+.card-body {
+  position: relative;
+  z-index: 1;
+}
+.btn.onclick {
+  position: relative;
+  z-index: 2;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+  margin: 50px;
+}
+
+
+{% endblock %}
+
+{% block body %}
+
+{% load static %}
+
+
+{% for category, data in all_products.items %}
+<div id="carousel-{{ forloop.counter }}" class="carousel slide my-3" data-bs-ride="carousel" data-bs-interval="3000"
+    data-bs-wrap="true">
+
+    <!-- Indicators -->
+    <div class="carousel-indicators">
+        {% for _ in data.slides %}
+        <button type="button" data-bs-target="#carousel-{{ forloop.parentloop.counter }}"
+            data-bs-slide-to="{{ forloop.counter0 }}" class="{% if forloop.first %}active{% endif %}"
+             {% if forloop.first %} aria-current="true" {% endif %} aria-label="Slide {{ forloop.counter }}" >
+            
+        </button>
+        {% endfor %}
+    </div>
+
+    <!-- Carousel Inner -->
+     <div class="container inner">
+        <h2 class="my-4">{{ category }}</h2>
+        <div class="carousel-inner">
+            {% for products in data.slides %}
+            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                <div class="row">
+                    {% for product in products %}
+                    <div class="col-md-3">
+                        <div class="card" style="width: 18rem;">
+                            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.product_name }}">
+                            <div class="card-body">
+                                <h5 class="card-title" id="prname{{ product.product_id}}"  >{{ product.product_name }}</h5>
+                                <p class="card-text">{{ product.desc|truncatewords:15 }}</p>
+                                <button id="pr{{ product.product_id}}"  class="btn btn-primary cart" onclick="buttonClick(event)">Buy ₹<span id ="prprice{{ product.product_id}}" >{{ product.price }} </span><span id="it{{ product.product_id}}" ></span>  </button>
+                                <a href="/shop/products/{{product.product_id}}"><button id="vr{{ product.product_id}}"  class="btn btn-primary cart" >Quick View</button></a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Controls -->
+    <button class="carousel-control-prev" type="button" data-bs-target="#carousel-{{ forloop.counter }}"
+        data-bs-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carousel-{{ forloop.counter }}"
+        data-bs-slide="next">
+        <span class="carousel-control-next-icon"></span>
+    </button>
+
+</div>
+{% endfor %}
+
+{% endblock %}
+
+{% block js %}
+
+<script>
+
+    console.log('Working1');
+
+    //Initial cart state on load//
+    
+    let cart = {};
+
+    if (localStorage.getItem('cart') == null) {
+        cart = {}
+    }
+    else {
+        cart = JSON.parse(localStorage.getItem('cart'))
+    };
+
+    
+    let popoverInitialized = false;
+
+    //update the cart along with popover//
+    updateCart() 
+
+
+    function updateCart(){
+
+        let totalItems = 0;
+
+        for (let product_id in cart){
+
+            let prodItems = cart[product_id].quantity;
+
+            let prodItemId = product_id.replace('pr', 'it');
+            //update product wise items//
+            let prodItemElement = document.getElementById(prodItemId);
+
+            prodItemElement.innerHTML = ` (${prodItems || 0})`;
+
+            totalItems = totalItems + cart[product_id].quantity;
+        }
+        //update total items//
+        document.getElementById('cart').innerHTML = totalItems
+
+        //popover message//
+        let popOverMessage = `<h5>Your Cart</h5>\n<br><b>Product   :   Quantity</b><hr><ul>`;
+
+        if(Object.keys(cart).length !==0){
+
+            for(let product_id in cart){
+
+                let productName = cart[product_id].name;
+                let productQuantity = cart[product_id].quantity;
+
+                popOverMessage = `${popOverMessage}<li>${productName.slice(0, 15)} <b>: ${productQuantity}</b></li><hr>`;
+               
+            }
+
+            let popOverEndMsg = `</ul>\n<hr><b>Total : ${Object.keys(cart).length} products & ${totalItems} items</b>`
+
+            let popOverBtns = "<a href='/shop/' id='clearCart'class='button btn btn-primary mx-1 my-4' >Clear Cart</a><a class='btn btn-primary mx-1 my-4' href='/shop/checkout'>Checkout</a>"
+
+            popOverMessage = popOverMessage  + popOverEndMsg + popOverBtns;
+
+        }else{
+
+            popOverMessage = "Your cart is empty"
+        }
+
+        updatePopover(cart, popOverMessage);
+
+    }
+
+    function updatePopover(cart, popOverMessage="Your cart is empty"){
+
+        const popkart1 = document.getElementById('popkart')
+
+        //This will ensure popover is not initialized everytime but only gets updated//
+        if (!popoverInitialized){
+
+            const options = {
+                trigger: 'click',
+                placement: 'bottom',
+                html: true
+            };
+            const popover = new bootstrap.Popover(popkart1, options);
+
+            popoverInitialized = true;
+
+        }
+        
+        const bsPopover = bootstrap.Popover.getInstance(popkart1);
+
+        if (bsPopover){
+
+            bsPopover.setContent({ '.popover-body': popOverMessage}); 
+
+        }else {
+            
+            popkart1.setAttribute('data-bs-content', popOverMessage); 
+        }
+
+    };
+
+
+    function buttonClick(event) {
+
+        const productId = event.currentTarget.id
+        //Name of the product //
+        const prodNameId = productId.replace('pr', 'prname')
+        let prodName = document.getElementById(prodNameId).innerHTML
+        //Price of the product//
+        const prodPriceId = productId.replace('pr', 'prprice')
+        let prodPrice = Number(document.getElementById(prodPriceId).innerHTML)
+
+        //check cart status//
+        if(!localStorage.getItem('cart')){
+            cart = {};
+        }else{
+            cart = JSON.parse(localStorage.getItem('cart'));
+        }
+
+        //Cart Logic//
+        if (cart[productId]){
+
+            cart[productId].quantity = cart[productId].quantity + 1;
+        }
+        else
+        {        
+            cart[productId] = {
+                name: prodName,
+                quantity: 1,
+                price: prodPrice
+            }
+        }
+    
+        localStorage.setItem('cart', JSON.stringify(cart))
+
+        console.log(cart)
+
+        updateCart();
+
+
+    };
+
+
+    function clearCart(){
+  
+        localStorage.removeItem('cart');
+
+        document.getElementById('cart').innerHTML = 0;
+
+        //select all product quantity elements and reset its value to default//
+        const productItems = document.querySelectorAll('[id^="it"]');
+
+        productItems.forEach((item)=>{
+
+            item.innerHTML = ""
+        })
+        
+        console.log('success')
+     
+        updatePopover();
+
+    }
+
+    document.addEventListener('click', function (e) {
+
+        if (e.target.id === 'clearCart') {
+
+            e.preventDefault();
+            clearCart();
+        }
+    });
+
+    updateCart()
+    
+    console.log('working2');
+
+
+    //update search message in alert 
+    let message = "{{ msg }}"
+
+    if (message.length!== 0){
+
+        alert(message)
+        window.location.href = '/shop/'
+    }
+
+</script>
+
+
+{% endblock %}
+
+
+
+
+

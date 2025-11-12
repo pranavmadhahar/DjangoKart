@@ -11,16 +11,55 @@ def index(request):
     all_products = {}
 
     for cat in categories:
+        #products list category wise
         products = list(Product.objects.filter(category=cat))
-        # Group into chunks of 4
+        #Group into chunks of 4 using list comprehension
         slides = [products[i:i+4] for i in range(0, len(products), 4)]
         
         all_products[cat] = {
+             
             "slides": slides,
             "slide_count": len(slides)
         }
 
     return render(request, 'shop/index.html', {'all_products': all_products})
+
+def searchMatch(query, item):
+    #  return true only if query matches item 
+     if query in item.desc.lower() or query in item.product_name.lower() or query in item.category.lower():
+        return True
+     else:
+        return False
+
+def search(request):
+    #get product entered in the search input
+    query = request.GET.get('search')
+    #get categories from the db
+    categories = Product.objects.values_list('category', flat=True).distinct()
+    all_products = {}
+
+    for cat in categories:
+        #products list category wise
+        products = list(Product.objects.filter(category=cat))
+        #list of products based on query using list comprehension
+        prod = [item for item in products if searchMatch(query, item)]
+        #Group into chunks of 4 using list comprehension
+        if len(prod) != 0:
+            slides = [prod[i:i+4] for i in range(0, len(prod), 4)]
+        
+            all_products[cat] = {
+                
+                "slides": slides,
+                "slide_count": len(slides)
+            }
+
+    params = {'all_products': all_products, 'msg': ""}
+
+    if len(all_products) == 0:
+         
+         params = {'msg': "There are no products matching your criteria"}
+         
+    return render(request, 'shop/search.html', params)
 
 
 def about(request):
@@ -51,8 +90,7 @@ def contact(request):
 def tracker(request):
     return render(request, 'shop/tracker.html')
 
-def search(request):
-    return render(request, 'shop/search.html')
+
 
 def productview(request, product_id):
     # fetch product using the product_id
@@ -67,6 +105,7 @@ def checkout(request):
 
         if request.method == 'POST':
             items_json = request.POST.get('itemsJson', '')
+            amount = request.POST.get('amount', '')
             name = request.POST.get('name', '')
             email = request.POST.get('email', '')
             phone = request.POST.get('phone', '')
@@ -77,6 +116,7 @@ def checkout(request):
 
             order = Order(
                 items_json = items_json,
+                amount = amount,
                 name = name,
                 email = email,
                 phone = phone,

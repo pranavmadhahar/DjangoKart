@@ -1,0 +1,74 @@
+{% extends 'blog/basic.html' %}
+
+{% block title %} Blogpost-Blog {% endblock %}
+
+{% block body %}
+
+<div class="container">
+
+    <main role="main" class="container mt-4">
+        <div class="row">
+            <div class="col-md-8 blog-main">
+                <h3 class="pb-3 mb-4 font-italic">
+                    <em>{{post.title}}</em>
+                </h3>
+
+                
+
+                <div class="blog-post">
+                    <h2 class="blog-post-title">{{post.head0}}</h2>
+                    <p class="blog-post-meta"> {{post.pub_date}} by <a href="#">Mark</a></p>
+                    <p><a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank"class="btn btn-primary btn-sm">
+                    Share@Facebook
+                </a></p>
+
+                    <p>{{post.chead0}}</p>
+                </div><!-- /.blog-post -->
+
+
+
+                <div class="blog-post">
+                    <h2 class="blog-post-title">{{post.head1}}</h2>
+                    <p class="blog-post-meta">January 1, 2014 by <a href="#">Mark</a></p>
+
+                    <p>{{post.chead1}}</p>
+                </div><!-- /.blog-post -->
+
+                <div class="blog-post">
+                    <h2 class="blog-post-title">{{post.head2}}</h2>
+                    <p class="blog-post-meta">December 14, 2013 by <a href="#">Chris</a></p>
+
+                    <p>{{post.chead2}}</p>
+                </div><!-- /.blog-post -->
+
+
+            </div><!-- /.blog-main -->
+
+            <aside class="col-md-4 blog-sidebar">
+
+                <div class="p-3 mb-3 bg-light rounded">
+                    <h4 class="fst-italic">About</h4>
+                    <p class="mb-0">DjangoKart is an <em>e-commerce website</em>. It is an easy-to-use platform for
+                        online shopping. </p>
+                </div>
+
+
+
+                <div class="p-3">
+                    <h4 class="fst-italic">Reach Us On: </h4>
+                    <ol class="list-unstyled">
+                        <li><a href="#">GitHub</a></li>
+                        <li><a href="#">Twitter</a></li>
+                        <li><a href="#">Facebook</a></li>
+                    </ol>
+                </div>
+
+            </aside><!-- /.blog-sidebar -->
+
+        </div><!-- /.row -->
+
+    </main>
+
+</div>
+
+{% endblock %}
